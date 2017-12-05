@@ -132,7 +132,8 @@ public class CountersPresenter implements CountersContract.Presenter {
                 if (!mView.isActive()) {
                     return;
                 }
-                processDeleteCounterResponse(counters);
+//                processDeleteCounterResponse(counters);
+                processCounters(counters);
             }
 
             @Override
