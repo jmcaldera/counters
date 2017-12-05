@@ -37,6 +37,7 @@ public class CountersPresenter implements CountersContract.Presenter {
     @Override
     public void loadCounters(boolean force) {
         if (force) {
+            mView.setLoadingIndicator(true);
             mRepository.refreshCounters();
         }
 
@@ -47,6 +48,7 @@ public class CountersPresenter implements CountersContract.Presenter {
                 if (!mView.isActive()) {
                     return;
                 }
+                mView.setLoadingIndicator(false);
                 processCounters(counters);
             }
 
@@ -67,6 +69,12 @@ public class CountersPresenter implements CountersContract.Presenter {
             mView.showNoCounters();
         } else {
             mView.showCounters(counters);
+        }
+    }
+
+    private void processDeleteCounterResponse(List<Counter> counters) {
+        if (counters.isEmpty()) {
+            processCounters(counters);
         }
     }
 
@@ -128,7 +136,7 @@ public class CountersPresenter implements CountersContract.Presenter {
                 if (!mView.isActive()) {
                     return;
                 }
-//                processCounters(counters);
+                processDeleteCounterResponse(counters);
             }
 
             @Override

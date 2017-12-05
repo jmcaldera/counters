@@ -3,8 +3,11 @@ package com.jmcaldera.counters.counters;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +29,7 @@ import com.jmcaldera.counters.addcounter.AddCounterActivity;
 import com.jmcaldera.counters.counters.helper.RecyclerItemTouchHelper;
 import com.jmcaldera.counters.data.model.Counter;
 import com.jmcaldera.counters.utils.Injection;
+import com.jmcaldera.counters.utils.ScrollChildSwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +51,6 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_counters);
 
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPresenter.loadCounters(true);
-            }
-        });
-
         mCountersAdapter = new CountersAdapter(new ArrayList<Counter>(0), mItemListener);
 
         new CountersPresenter(this, Injection.provideCountersRepository());
@@ -67,6 +63,31 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
         countersList.addItemDecoration(new DividerItemDecoration(countersList.getContext(), layoutManager.getOrientation()));
 
         setupRecyclerViewSwipeBehaviour(countersList);
+
+        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
+                (ScrollChildSwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeColors(
+                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.colorAccent),
+                ContextCompat.getColor(this, R.color.colorPrimaryDark)
+        );
+
+        swipeRefreshLayout.setScrollUpChild(countersList);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mPresenter.loadCounters(true);
+            }
+        });
+        Button addCounter = (Button) findViewById(R.id.button_add_counter);
+        addCounter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPresenter.addNewCounter();
+            }
+        });
+
     }
 
     void setupRecyclerViewSwipeBehaviour(RecyclerView recyclerView) {
@@ -87,8 +108,13 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
                     mCountersAdapter.removeItem(viewHolder.getAdapterPosition());
 
                     // show snackbar
-                    Snackbar.make(CountersActivity.this.findViewById(android.R.id.content),
-                            name + " eliminado!", Snackbar.LENGTH_LONG).show();
+                    Snackbar snackbar = Snackbar.make(CountersActivity.this.findViewById(android.R.id.content),
+                            "Eliminado",Snackbar.LENGTH_LONG);
+                    View snackbarView = snackbar.getView();
+                    snackbarView.setBackgroundColor(CountersActivity.this.getResources().getColor(R.color.colorAccent));
+                    snackbar.show();
+//                    Snackbar.make(CountersActivity.this.findViewById(android.R.id.content),
+//                            "Eliminado", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -136,8 +162,21 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
     }
 
     @Override
-    public void setLoadingIndicator(boolean active) {
+    public void setLoadingIndicator(final boolean active) {
 
+//        if (this.active) {
+//            return;
+//        }
+        final SwipeRefreshLayout srl =
+                (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+
+        // Make sure setRefreshing() is called after the layout is done with everything else.
+//        srl.post(new Runnable() {
+//            @Override
+//            public void run() {
+                srl.setRefreshing(active);
+//            }
+//        });
     }
 
     @Override
@@ -145,9 +184,12 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
         mCountersAdapter.replaceData(counters);
 
         // TODO: add no counters view
-        // RecyclerView visible
-        // No counters gone
-
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_counters);
+        recyclerView.setVisibility(View.VISIBLE);
+        LinearLayout noCountersContainer = (LinearLayout) findViewById(R.id.no_counters_container);
+        noCountersContainer.setVisibility(View.GONE);
+        LinearLayout totalContainer = (LinearLayout) findViewById(R.id.total_container);
+        totalContainer.setVisibility(View.VISIBLE);
         // Get counter sum
         mPresenter.getCountersSum();
     }
@@ -156,9 +198,13 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
     public void showNoCounters() {
         //TODO show no counters view
         //RecyclverView Gone
-        // No counters visible. set drawable
-        Toast.makeText(this, "No hay counters!", Toast.LENGTH_SHORT).show();
-        mPresenter.getCountersSum();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_counters);
+        recyclerView.setVisibility(View.GONE);
+        LinearLayout noCountersContainer = (LinearLayout) findViewById(R.id.no_counters_container);
+        noCountersContainer.setVisibility(View.VISIBLE);
+        LinearLayout totalContainer = (LinearLayout) findViewById(R.id.total_container);
+        totalContainer.setVisibility(View.GONE);
+//        mPresenter.getCountersSum();
     }
 
     @Override
@@ -183,7 +229,6 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
     @Override
     public void showCountersSum(int sum) {
         TextView mTextTotal = (TextView) findViewById(R.id.text_total);
-//        mTextTotal.setText(String.format(getResources().getString(R.string.counter_total), sum));
         mTextTotal.setText(getResources().getString(R.string.counter_total, sum));
     }
 
@@ -281,8 +326,8 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
 
             public TextView mTextCounterName;
             public TextView mTextCount;
-            public Button mIncrementButton;
-            public Button mDecrementButton;
+            public AppCompatImageButton mIncrementButton;
+            public AppCompatImageButton mDecrementButton;
             public RelativeLayout mBackgroundContainer;
             public RelativeLayout mForegroundContainer;
 
@@ -291,8 +336,8 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
 
                 mTextCounterName = (TextView) itemView.findViewById(R.id.text_counter_name);
                 mTextCount = (TextView) itemView.findViewById(R.id.text_count);
-                mIncrementButton = (Button) itemView.findViewById(R.id.button_increment);
-                mDecrementButton = (Button) itemView.findViewById(R.id.button_decrement);
+                mIncrementButton = (AppCompatImageButton) itemView.findViewById(R.id.button_increment);
+                mDecrementButton = (AppCompatImageButton) itemView.findViewById(R.id.button_decrement);
                 mBackgroundContainer = (RelativeLayout) itemView.findViewById(R.id.background_container);
                 mForegroundContainer = (RelativeLayout) itemView.findViewById(R.id.foreground_container);
             }

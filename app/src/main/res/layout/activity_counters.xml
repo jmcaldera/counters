@@ -10,31 +10,18 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/total_container">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_counters"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <include layout="@layout/content_layout"/>
 
-        </android.support.v7.widget.RecyclerView>
     </android.support.design.widget.CoordinatorLayout>
 
     <LinearLayout
         android:id="@+id/total_container"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
         android:weightSum="3">
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="GET"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_gravity="center"
-            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/text_total"
@@ -42,8 +29,8 @@
             android:layout_height="wrap_content"
             android:text="@string/counter_total"
             style="@style/TextAppearance.AppCompat.Large.Inverse"
-            android:layout_weight="2"
-            android:gravity="end"
+            android:layout_weight="3"
+            android:gravity="center"
             android:layout_gravity="center_vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"/>
