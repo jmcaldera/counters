@@ -177,4 +177,20 @@ public class RemoteDataSource implements DataSource {
             }
         });
     }
+
+    @Override
+    public void refreshCounters() {
+        /**
+         * Not used. {@link com.jmcaldera.counters.data.CountersRepository} handles this logic
+         */
+    }
+
+    /**
+     * Should not be called. Instead, use the cached counters.
+     * @return 0
+     */
+    @Override
+    public int getCounterSum() {
+        return 0;
+    }
 }

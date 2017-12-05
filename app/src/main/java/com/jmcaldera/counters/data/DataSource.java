@@ -24,4 +24,8 @@ public interface DataSource {
     void decrementCounter(String id, LoadCountersCallback callback);
 
     void deleteCounter(String id, LoadCountersCallback callback);
+
+    void refreshCounters();
+
+    int getCounterSum();
 }

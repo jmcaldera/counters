@@ -46,7 +46,7 @@ public class CountersRepository implements DataSource {
     public void getCounters(@NonNull LoadCountersCallback callback) {
         checkNotNull(callback);
 
-        if (mCachedCounters != null) {
+        if (mCachedCounters != null && !mCacheIsDirty) {
             callback.onSuccess(new ArrayList<Counter>(mCachedCounters.values()));
             return;
         }
@@ -78,7 +78,7 @@ public class CountersRepository implements DataSource {
         for (Counter counter : counters) {
             mCachedCounters.put(counter.getId(), counter);
         }
-//        mCacheIsDirty = false;
+        mCacheIsDirty = false;
     }
 
     @Override
@@ -152,5 +152,22 @@ public class CountersRepository implements DataSource {
                 callback.onError(error);
             }
         });
+    }
+
+    @Override
+    public void refreshCounters() {
+        mCacheIsDirty = true;
+    }
+
+    @Override
+    public int getCounterSum() {
+        int sum = 0;
+        if (mCachedCounters != null) {
+            ArrayList<Counter> mCounters = new ArrayList<>(mCachedCounters.values());
+            for (Counter counter : mCounters) {
+                sum += counter.getCount();
+            }
+        }
+        return sum;
     }
 }
