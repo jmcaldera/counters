@@ -1,8 +1,6 @@
 package com.jmcaldera.counters.counters;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-
 import com.jmcaldera.counters.data.CountersRepository;
 import com.jmcaldera.counters.data.DataSource;
 import com.jmcaldera.counters.data.model.Counter;
@@ -44,7 +42,6 @@ public class CountersPresenter implements CountersContract.Presenter {
         mRepository.getCounters(new DataSource.LoadCountersCallback() {
             @Override
             public void onSuccess(List<Counter> counters) {
-                Log.d(TAG, "onSuccess, counters: " + counters.toString());
                 if (!mView.isActive()) {
                     return;
                 }
@@ -54,7 +51,6 @@ public class CountersPresenter implements CountersContract.Presenter {
 
             @Override
             public void onError(Throwable error) {
-                Log.d(TAG, "onError, error: " + error.getMessage());
                 if (!mView.isActive()) {
                     return;
                 }

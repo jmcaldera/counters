@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -58,5 +59,14 @@ public class CountersRepositoryTest {
         verify(mRemoteDataSource).getCounters(mCallbackCaptor.capture());
         mCallbackCaptor.getValue().onSuccess(COUNTERS);
         verify(mRemoteDataSource).getCounters(any(DataSource.LoadCountersCallback.class));
+    }
+
+    @Test
+    public void addCounter_addCounterToRemoteDataSource() {
+        String title = "bob";
+        mCountersRepository.addCounter(title, mCallback);
+        verify(mRemoteDataSource).addCounter(eq(title), mCallbackCaptor.capture());
+        mCallbackCaptor.getValue().onSuccess(COUNTERS);
+        verify(mRemoteDataSource).addCounter(any(String.class), any(DataSource.LoadCountersCallback.class));
     }
 }
