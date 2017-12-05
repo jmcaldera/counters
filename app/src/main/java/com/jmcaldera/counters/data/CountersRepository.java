@@ -2,9 +2,7 @@ package com.jmcaldera.counters.data;
 
 import android.support.annotation.NonNull;
 
-import com.jmcaldera.counters.data.local.LocalDataSource;
 import com.jmcaldera.counters.data.model.Counter;
-import com.jmcaldera.counters.data.remote.RemoteDataSource;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,22 +23,16 @@ public class CountersRepository implements DataSource {
 
     private final DataSource mRemoteDataSource;
 
-//    private final DataSource mLocalDataSource;
-
     Map<String, Counter> mCachedCounters;
 
     boolean mCacheIsDirty = false;
 
-//    public CountersRepository(@NonNull DataSource remoteDataSource, @NonNull DataSource localDataSource) {
     public CountersRepository(@NonNull DataSource remoteDataSource) {
         this.mRemoteDataSource = checkNotNull(remoteDataSource);
-//        this.mLocalDataSource = checkNotNull(localDataSource);
     }
 
-//    public static CountersRepository getInstance(DataSource remoteDataSource, DataSource localDataSource) {
     public static CountersRepository getInstance(DataSource remoteDataSource) {
         if (INSTANCE == null){
-//            INSTANCE = new CountersRepository(remoteDataSource, localDataSource);
             INSTANCE = new CountersRepository(remoteDataSource);
         }
         return INSTANCE;
@@ -90,22 +82,75 @@ public class CountersRepository implements DataSource {
     }
 
     @Override
-    public void addCounter(String title, LoadCountersCallback callback) {
+    public void addCounter(@NonNull String title, @NonNull final LoadCountersCallback callback) {
+        checkNotNull(title, "Title cannot be null");
+        checkNotNull(callback, "Callback cannot be null");
+        mRemoteDataSource.addCounter(title, new LoadCountersCallback() {
+            @Override
+            public void onSuccess(List<Counter> counters) {
+                refreshCache(counters);
+                callback.onSuccess(new ArrayList<Counter>(mCachedCounters.values()));
+            }
 
+            @Override
+            public void onError(Throwable error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    // TODO: chequear si es mejor pasar objeto Counter a pasar id, para refrescar la cache
+    @Override
+    public void incrementCounter(@NonNull String id, @NonNull final LoadCountersCallback callback) {
+        checkNotNull(id);
+        checkNotNull(callback);
+        mRemoteDataSource.incrementCounter(id, new LoadCountersCallback() {
+            @Override
+            public void onSuccess(List<Counter> counters) {
+                refreshCache(counters);
+                callback.onSuccess(new ArrayList<Counter>(mCachedCounters.values()));
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                callback.onError(error);
+            }
+        });
     }
 
     @Override
-    public void incrementCounter(String id, LoadCountersCallback callback) {
+    public void decrementCounter(@NonNull String id, @NonNull final LoadCountersCallback callback) {
+        checkNotNull(id);
+        checkNotNull(callback);
+        mRemoteDataSource.decrementCounter(id, new LoadCountersCallback() {
+            @Override
+            public void onSuccess(List<Counter> counters) {
+                refreshCache(counters);
+                callback.onSuccess(new ArrayList<Counter>(mCachedCounters.values()));
+            }
 
+            @Override
+            public void onError(Throwable error) {
+                callback.onError(error);
+            }
+        });
     }
 
     @Override
-    public void decrementCounter(String id, LoadCountersCallback callback) {
+    public void deleteCounter(@NonNull String id, @NonNull final LoadCountersCallback callback) {
+        checkNotNull(id);
+        checkNotNull(callback);
+        mRemoteDataSource.deleteCounter(id, new LoadCountersCallback() {
+            @Override
+            public void onSuccess(List<Counter> counters) {
+                refreshCache(counters);
+                callback.onSuccess(new ArrayList<Counter>(mCachedCounters.values()));
+            }
 
-    }
-
-    @Override
-    public void deleteCounter(String id, LoadCountersCallback callback) {
-
+            @Override
+            public void onError(Throwable error) {
+                callback.onError(error);
+            }
+        });
     }
 }

@@ -8,7 +8,6 @@ import android.widget.Button;
 
 import com.jmcaldera.counters.data.CountersRepository;
 import com.jmcaldera.counters.data.DataSource;
-import com.jmcaldera.counters.data.local.LocalDataSource;
 import com.jmcaldera.counters.data.model.Counter;
 import com.jmcaldera.counters.data.remote.RemoteDataSource;
 
