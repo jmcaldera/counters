@@ -128,7 +128,7 @@ public class CountersPresenter implements CountersContract.Presenter {
                 if (!mView.isActive()) {
                     return;
                 }
-                processCounters(counters);
+//                processCounters(counters);
             }
 
             @Override

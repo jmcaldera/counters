@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 
 /**
@@ -30,7 +31,10 @@ public interface CounterApiClient {
     @POST("/api/v1/counter/dec")
     Call<List<Counter>> decrementCounter(@Body OperateCounterForm form);
 
-    @DELETE("/api/v1/counter")
+//    @DELETE("/api/v1/counter")
+//    Call<List<Counter>> deleteCounter(@Body OperateCounterForm form);
+
+    @HTTP(method = "DELETE", path = "/api/v1/counter", hasBody = true)
     Call<List<Counter>> deleteCounter(@Body OperateCounterForm form);
 
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,11 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jmcaldera.counters.R;
 import com.jmcaldera.counters.addcounter.AddCounterActivity;
+import com.jmcaldera.counters.counters.helper.RecyclerItemTouchHelper;
 import com.jmcaldera.counters.data.model.Counter;
 import com.jmcaldera.counters.utils.Injection;
 
@@ -61,6 +65,34 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
         countersList.setLayoutManager(layoutManager);
         countersList.setAdapter(mCountersAdapter);
         countersList.addItemDecoration(new DividerItemDecoration(countersList.getContext(), layoutManager.getOrientation()));
+
+        setupRecyclerViewSwipeBehaviour(countersList);
+    }
+
+    void setupRecyclerViewSwipeBehaviour(RecyclerView recyclerView) {
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0,
+                ItemTouchHelper.LEFT, new RecyclerItemTouchHelper.RecyclerItemTouchHelperListener() {
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+                if (viewHolder instanceof CountersAdapter.CounterViewHolder) {
+                    String name = mCountersAdapter.mCounters.get(viewHolder.getAdapterPosition()).getTitle();
+
+                    // backup object
+                    Counter counter = mCountersAdapter.mCounters.get(viewHolder.getAdapterPosition());
+                    int deletedIndex = viewHolder.getAdapterPosition();
+
+                    // remove item form rv
+                    mCountersAdapter.removeItem(viewHolder.getAdapterPosition());
+
+                    // show snackbar
+                    Snackbar.make(CountersActivity.this.findViewById(android.R.id.content),
+                            name + " eliminado!", Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -193,6 +225,17 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
             notifyDataSetChanged();
         }
 
+        public void removeItem(int position) {
+            mListener.deleteCounter(mCounters.get(position).getId());
+            mCounters.remove(position);
+            notifyItemRemoved(position);
+        }
+
+        public void restoreItem(Counter counter, int position) {
+            mCounters.add(position, counter);
+            notifyItemInserted(position);
+        }
+
         private void setList(List<Counter> counters) {
             this.mCounters = checkNotNull(counters);
         }
@@ -236,10 +279,12 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
 
         public class CounterViewHolder extends RecyclerView.ViewHolder {
 
-            TextView mTextCounterName;
-            TextView mTextCount;
-            Button mIncrementButton;
-            Button mDecrementButton;
+            public TextView mTextCounterName;
+            public TextView mTextCount;
+            public Button mIncrementButton;
+            public Button mDecrementButton;
+            public RelativeLayout mBackgroundContainer;
+            public RelativeLayout mForegroundContainer;
 
             public CounterViewHolder(View itemView) {
                 super(itemView);
@@ -248,6 +293,8 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
                 mTextCount = (TextView) itemView.findViewById(R.id.text_count);
                 mIncrementButton = (Button) itemView.findViewById(R.id.button_increment);
                 mDecrementButton = (Button) itemView.findViewById(R.id.button_decrement);
+                mBackgroundContainer = (RelativeLayout) itemView.findViewById(R.id.background_container);
+                mForegroundContainer = (RelativeLayout) itemView.findViewById(R.id.foreground_container);
             }
         }
     }
