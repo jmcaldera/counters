@@ -113,8 +113,6 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
                     View snackbarView = snackbar.getView();
                     snackbarView.setBackgroundColor(CountersActivity.this.getResources().getColor(R.color.colorAccent));
                     snackbar.show();
-//                    Snackbar.make(CountersActivity.this.findViewById(android.R.id.content),
-//                            "Eliminado", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -164,26 +162,16 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
     @Override
     public void setLoadingIndicator(final boolean active) {
 
-//        if (this.active) {
-//            return;
-//        }
         final SwipeRefreshLayout srl =
                 (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-//        srl.post(new Runnable() {
-//            @Override
-//            public void run() {
-                srl.setRefreshing(active);
-//            }
-//        });
+        srl.setRefreshing(active);
     }
 
     @Override
     public void showCounters(List<Counter> counters) {
         mCountersAdapter.replaceData(counters);
 
-        // TODO: add no counters view
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_counters);
         recyclerView.setVisibility(View.VISIBLE);
         LinearLayout noCountersContainer = (LinearLayout) findViewById(R.id.no_counters_container);
@@ -196,7 +184,6 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
 
     @Override
     public void showNoCounters() {
-        //TODO show no counters view
         //RecyclverView Gone
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_counters);
         recyclerView.setVisibility(View.GONE);
@@ -314,7 +301,6 @@ public class CountersActivity extends AppCompatActivity implements CountersContr
                 }
             });
 
-            // TODO: swipe para borrar el contador
         }
 
         @Override

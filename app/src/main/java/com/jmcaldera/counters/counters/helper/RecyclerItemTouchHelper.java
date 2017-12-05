@@ -29,7 +29,6 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             View foregroundView = ((CountersActivity.CountersAdapter.CounterViewHolder) viewHolder).mForegroundContainer;
             getDefaultUIUtil().onSelected(foregroundView);
         }
-//        super.onSelectedChanged(viewHolder, actionState);
     }
 
     @Override
@@ -54,7 +53,6 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
                             int actionState, boolean isCurrentlyActive) {
         View foregroundView = ((CountersActivity.CountersAdapter.CounterViewHolder) viewHolder).mForegroundContainer;
         getDefaultUIUtil().onDraw(c, recyclerView,foregroundView, dX, dY, actionState, isCurrentlyActive);
-//        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
 
     @Override
