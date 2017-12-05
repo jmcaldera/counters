@@ -25,3 +25,19 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    minSdkVersion = 16
+    targetSdkVersion = 26
+    compileSdkVersion = 26
+
+    // Dependencies
+    junitVersion = '4.12'
+    runnerVersion = '1.0.1'
+    espressoVersion = '3.0.1'
+    mockitoVersion = '1.10.19'
+
+    supportLibraryVersion = '26.1.0'
+    guavaVersion = '20.0'
+    retrofitVersion = '2.3.0'
+}
